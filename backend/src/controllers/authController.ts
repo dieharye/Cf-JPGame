@@ -1,9 +1,17 @@
 import expressAsyncHandler from "express-async-handler";
-import {Request, Response} from "express";
+import { Request, Response } from "express";
+import Account from "../models/account"
+import { STATUS_CODES } from "http";
+import { CustomError, BadRequest } from "../errors";
 
 const signUp = expressAsyncHandler(
-    (req: Request, res: Response) => {
-        res.status(200).json("signUp");
+    async (req: Request, res: Response) => {
+        const usernameExists = await Account.find({ username: req.body.username })
+        const emailExists = await Account.find({ email: req.body.email })
+
+        if(usernameExists || emailExists){
+            throw BadRequest
+        }
     }
 )
 
@@ -21,4 +29,4 @@ const signOut = expressAsyncHandler(
     }
 )
 
-export {signUp, signIn, signOut}
+export { signUp, signIn, signOut }
