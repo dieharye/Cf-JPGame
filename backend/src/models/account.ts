@@ -1,9 +1,12 @@
-import mongoose, { Document, Schema, model } from 'mongoose';
+import mongoose, { CallbackError, Document, Schema, model } from 'mongoose';
 import validator from 'validator';
+import bcrypt from 'bcryptjs';
+import { createHash } from "crypto";
+import { CustomError } from '../errors';
 // Define an interface representing a document in MongoDB.
 interface IAccount extends Document {
-  email: string;
-  username: string;
+  email: string,
+  name: string;
   password: string;
   avatarId?: string;
   headshot?: string | null;
@@ -22,15 +25,15 @@ const accountSchema: Schema = new Schema({
   email: {
     type: String,
     required: [true, "Email is required"],
+    validate: {
+      validator: (value: string) => validator.isEmail(value),
+      message: "Email is invalid"
+    },
     unique: true,
   },
   username: {
     type: String,
     required: [true, "Username is required"],
-    validate:{
-        validator:(value:string) => validator.isEmail(value),
-        message: "Email is invalid"
-    },
     minLength: [2, "Username must be at least 2 characters long"],
     unique: true,
   },
@@ -51,5 +54,27 @@ const accountSchema: Schema = new Schema({
   isAdmin: { type: Boolean, default: false }
 });
 
+accountSchema.pre<IAccount>('save', async function (next) {
+  if (!this.isModified('password')) {
+    return next();
+  }
+
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(this.password, salt);
+    this.password = hash;
+    next();
+  } catch (err: any) {
+    console.log(err)
+    next(err);
+  }
+
+  try {
+    this.avatarId = await createHash('sha256').update(this.email).digest('hex')
+  } catch (err: any) {
+    console.log(err)
+    next(err)
+  }
+});
 // Define and export the Mongoose model
 export default model<IAccount>('Account', accountSchema);

@@ -1,8 +1,9 @@
-import { Request, Response, NextFunction } from 'express'
+import { Request, Response, NextFunction } from 'express';
 import { CustomError } from '../errors';
-const notFoundHandler = (req: Request, res: Response, next: NextFunction) => {
-    const error = new CustomError(404, 'Not Found');
-    next()
-}
 
-export default notFoundHandler
+const notFoundHandler = (req: Request, res: Response, next: NextFunction) => {
+  const error = new CustomError(404, 'Not Found');
+  return next(error);
+};
+
+export default notFoundHandler;
