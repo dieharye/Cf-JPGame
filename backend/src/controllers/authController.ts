@@ -3,11 +3,7 @@ import Roblox, { HeadshotFormat, HeadshotSize } from "../modules/roblox";
 import { Request, Response } from "express";
 import Account, { IAccount } from "../models/account";
 import validator from "validator";
-import bcrypt from "bcryptjs"
-import jwt from "jsonwebtoken"
-import { STATUS_CODES } from "http";
 import { CustomError, BadRequest } from "../errors";
-import {JWT_SECRET, TOKEN_EXPIRE_TIME} from '../config/config'
 
 
 // Define an interface for the Account model to extend the Mongoose Document
