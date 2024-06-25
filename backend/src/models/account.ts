@@ -25,6 +25,10 @@ export interface IAccount extends Document {
   generateAuthToken(): string;
 }
 
+export interface IAccountModel extends Model<IAccount> {
+  verifyToken(token: string): any;
+}
+
 // Define the schema corresponding to the document interface.
 const accountSchema: Schema<IAccount> = new Schema({
   email: {
@@ -108,6 +112,5 @@ accountSchema.statics.verifyToken = function (token: string) {
 };
 
 // Define and export the Mongoose model
-const Account: Model<IAccount> = model<IAccount>('Account', accountSchema);
+const Account: IAccountModel = model<IAccount, IAccountModel>('Account', accountSchema);
 export default Account;
-         
